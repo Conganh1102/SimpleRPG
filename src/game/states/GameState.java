@@ -23,8 +23,8 @@ public class GameState extends State {
 		
 	}
 	private void changeWorld(){
-		if(handler.getWorld().getEntityManager().getPlayer().getX() > handler.getWorld().getWidth()*Tile.TILEWIDTH 
-				|| handler.getWorld().getEntityManager().getPlayer().getY() > handler.getWorld().getHeight()*Tile.TILEHEIGHT){
+		if(handler.getWorld().getEntityManager().getPlayer().getX() + 256/2 > handler.getWorld().getWidth()*Tile.TILEWIDTH 
+				|| handler.getWorld().getEntityManager().getPlayer().getY() + 128/2 > handler.getWorld().getHeight()*Tile.TILEHEIGHT){
 			if(ismap){
 				handler.setWorld(world3);
 				handler.getWorld().getEntityManager().getPlayer().setX(16);

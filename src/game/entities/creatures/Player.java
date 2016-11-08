@@ -27,13 +27,13 @@ public class Player extends Creature {
 
 	public Player(Handler handler, float x, float y) {
 		super(handler, x, y, 256, 128);
-		dameged = 500;
+		dameged = 200;
 		healing = 0.1f;
 		plusmana = 1;
 		isAttack = false;
 		isShoot = false;
-		speed = 2.0f;
-		tire = 10;
+		speed = 2.5f;
+		tire = 1;
 
 		// from entity class, change to player model size
 		bounds.x = 118;// 22
@@ -42,14 +42,14 @@ public class Player extends Creature {
 		bounds.height = 19;// 19
 
 		// Animations
-		animDown = new Animation(500 / 2, Assets.player2_down);
-		animUp = new Animation(500 / 2, Assets.player2_up);
-		animLeft = new Animation(500 / 2, Assets.player2_left);
-		animRight = new Animation(500 / 2, Assets.player2_right);
-		aRight = new Animation(500, Assets.player_aright);
-		aDown = new Animation(500, Assets.player_adown);
-		aUp = new Animation(500, Assets.player_aup);
-		aLeft = new Animation(500, Assets.player_aleft);
+		animDown = new Animation(100, Assets.player2_down);
+		animUp = new Animation(100, Assets.player2_up);
+		animLeft = new Animation(100, Assets.player2_left);
+		animRight = new Animation(100, Assets.player2_right);
+		aRight = new Animation(100, Assets.player2_aright);
+		aDown = new Animation(100, Assets.player2_adown);
+		aUp = new Animation(100, Assets.player2_aup);
+		aLeft = new Animation(100, Assets.player2_aleft);
 	}
 
 	@Override
@@ -178,39 +178,23 @@ public class Player extends Creature {
 		
 		if (mana > 0) {
 			
-			if (handler.getMouseManager().isRightPressed()) {
+			if (handler.getMouseManager().isLeftPressed()) {
 				isAttack = true;
 				tired(tire);	
 			}
-			if ((handler.getKeyManager().fire || handler.getMouseManager().isLeftPressed()) && fireRate <= 0) {
-				tired(tire);
+			if ((handler.getKeyManager().fire || handler.getMouseManager().isRightPressed()) && fireRate <= 0) {
+				tired(100*tire);
 				isShoot = true;
 				fireRate = FireProjectile.FIRE_RATE;
 			}
 			
-//			if (handler.getKeyManager().aUp) {
-//				attack = 1;
-//				tired(tire);
-//			}
-//			if (handler.getKeyManager().aDown) {
-//				attack = 2;
-//				tired(tire);
-//			}
-//			if (handler.getKeyManager().aLeft) {
-//				attack = 3;
-//				tired(tire);
-//			}
-//			if (handler.getKeyManager().aRight && fireRate <= 0) {
-//				attack = 4;
-//				tired(tire);
-//			}
 		}
 
 	}
 
 	private void updateShooting() {
 		if (isShoot) {
-			shoot((int) (x + this.width/2), (int) (y + this.height/2), dir);
+			shoot((int) (x + this.width/2 - 15), (int) (y + this.height/2), dir);
 		}
 
 	}
@@ -221,34 +205,10 @@ public class Player extends Creature {
 		handler.getWorld().getEntityManager().addEntity(p);
 	}
 
-	public void dare(Graphics g) {
-		if (isAttack) {
-			// System.out.println(attackRa
-			if (dir == 4)
-				g.drawImage(Assets.kunai[0], (int) (x + 45 - handler.getGameCamera().getxOffset()),
-						(int) (y + 15 - handler.getGameCamera().getyOffset()), 64, 64, null);
-			else if (dir == 3)
-				g.drawImage(Assets.kunai[1], (int) (x - 43 - handler.getGameCamera().getxOffset()),
-						(int) (y + 15 - handler.getGameCamera().getyOffset()), 64, 64, null);
-			else if (dir == 2)
-				g.drawImage(Assets.kunai[3], (int) (x - handler.getGameCamera().getxOffset()),
-						(int) (y + 60 - handler.getGameCamera().getyOffset()), 64, 64, null);
-			else if (dir == 1)
-				g.drawImage(Assets.kunai[2], (int) (x - handler.getGameCamera().getxOffset()),
-						(int) (y - 30 - handler.getGameCamera().getyOffset()), 64, 64, null);
-			else
-				g.drawImage(Assets.kunai[3], (int) (x - handler.getGameCamera().getxOffset()),
-						(int) (y + 60 - handler.getGameCamera().getyOffset()), 64, 64, null);
-
-		}
-
-	}
-
 	// render graphics
 	@Override
 	public void render(Graphics g) {
 		// center the game camera on the player
-		dare(g);
 		g.drawImage(getCurrentAnimationFrame(), (int) (x - handler.getGameCamera().getxOffset()),
 				(int) (y - handler.getGameCamera().getyOffset()), width, height, null);
 		g.setColor(Color.red);
@@ -256,10 +216,10 @@ public class Player extends Creature {
 				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT - 15),
 				(int) (1.0 * health / 20), 4);
 
-		 g.fillRect((int) (x + bounds.x -
-		 handler.getGameCamera().getxOffset()),
-		 (int) (y + bounds.y - handler.getGameCamera().getyOffset()),
-		 bounds.width, bounds.height);
+//		 g.fillRect((int) (x + bounds.x -
+//		 handler.getGameCamera().getxOffset()),
+//		 (int) (y + bounds.y - handler.getGameCamera().getyOffset()),
+//		 bounds.width, bounds.height);
 
 		g.setColor(Color.green);
 		g.fillRect((int) (x + bounds.x - handler.getGameCamera().getxOffset() - 17),
@@ -269,14 +229,6 @@ public class Player extends Creature {
 
 	// return animation frame
 	private BufferedImage getCurrentAnimationFrame() {
-		// if (attack == 1)
-		// return aUp.getCurrentFrame();
-		// else if (attack == 2 && fireRate <= 0)
-		// return aDown.getCurrentFrame();
-		// else if (attack == 3 && fireRate <= 0)
-		// return aLeft.getCurrentFrame();
-		// else if (attack == 4)
-		// return aRight.getCurrentFrame();
 		if (xMove < 0)
 			return animLeft.getCurrentFrame();
 		else if (xMove > 0)
@@ -285,14 +237,26 @@ public class Player extends Creature {
 			return animUp.getCurrentFrame();
 		else if (yMove > 0)
 			return animDown.getCurrentFrame();
-		else if (dir == 1)
+		else if (dir == 1){
+			if(isAttack)
+				return aUp.getCurrentFrame();
 			return animUp.getFrame(2);
-		else if (dir == 2)
+		}
+		else if (dir == 2){
+			if(isAttack)
+				return aDown.getCurrentFrame();
 			return animDown.getFrame(2);
-		else if (dir == 3)
+		}
+		else if (dir == 3){
+			if(isAttack)
+				return aLeft.getCurrentFrame();
 			return animLeft.getFrame(2);
-		else if (dir == 4)
-			return animRight.getFrame(2);
+		}
+		else if (dir == 4){
+			if(isAttack)
+				return aRight.getCurrentFrame();
+			return animRight.getFrame(2);	
+		}
 		else
 			return animDown.getFrame(2);
 

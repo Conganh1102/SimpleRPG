@@ -20,7 +20,7 @@ public class FireProjectile extends Projectile {
 		bounds.width = 19;
 		bounds.height = 19;
 		//
-		kunai = new Animation(30, Assets.projectile_hero);
+		kunai = new Animation(30, Assets.kunai);
 	}
 	public void update() {				
 		checkAttacks();
