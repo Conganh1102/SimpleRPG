@@ -7,14 +7,14 @@ import game.gfx.Assets;
 
 public class FireProjectile extends Projectile {
 
-	public static final int FIRE_RATE = 35;
+	public static final int FIRE_RATE = 70;
 	private Animation kunai;
 	public FireProjectile(Handler handler, int x, int y, double dir) {
-		super(handler, x, y, dir);
-		range = 500;
-		damage = 500;
+		super(handler, x, y, dir, 32, 32);
+		range = 300;
+		damage = 250;
 		speed = 5;
-		// from entity class, change to player model size
+		// 
 		bounds.x = 0;
 		bounds.y = 0;
 		bounds.width = 19;
@@ -31,16 +31,12 @@ public class FireProjectile extends Projectile {
 		kunai.tick();
 		update();
 		move();
-
 	}
 
 	@Override
 	public void render(Graphics g) {
 		g.drawImage(kunai.getCurrentFrame(), (int) (x - handler.getGameCamera().getxOffset()), 
 				(int) (y - handler.getGameCamera().getyOffset()), width, height, null);
-		
-
-
 	}
 
 	@Override

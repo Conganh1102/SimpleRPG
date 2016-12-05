@@ -9,7 +9,6 @@ public class Assets {
 	public static BufferedImage dirt, grass, stone, tree, rock;
 	public static BufferedImage[] player_down, player_up, player_left, player_right;
 	public static BufferedImage[] player2_down, player2_up, player2_left, player2_right;
-	public static BufferedImage[] player2_left_up, player2_left_down, player2_right_down, player2_right_up;
 	public static BufferedImage[] player2_adown, player2_aup, player2_aleft, player2_aright;
 	public static BufferedImage[] zombie_down, zombie_up, zombie_left, zombie_right;
 	public static BufferedImage[] btn_start;

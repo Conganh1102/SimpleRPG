@@ -1,7 +1,5 @@
 package game;
 
- 
-
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
@@ -108,7 +106,6 @@ public class Game implements Runnable {
 		long now;
 		long lastTime = System.nanoTime();
 		long timer = 0;
-		int ticks = 0;
 		
 		while(running){
 			now = System.nanoTime();
@@ -119,14 +116,11 @@ public class Game implements Runnable {
 			if(delta >= 1){
 				tick();
 				render();
-				ticks++;
 				delta--;
 				
 			}
 			
 			if(timer >= 1000000000){
-				//System.out.println("Ticks and Frame " + ticks );
-				ticks = 0;
 				timer = 0;
 			}
 		}

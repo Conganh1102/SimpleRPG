@@ -1,7 +1,6 @@
 package game.gfx;
 import game.Handler;
 import game.entities.Entity;
-import game.entities.creatures.Player;
 import game.tiles.Tile;
 
 public class GameCamera {

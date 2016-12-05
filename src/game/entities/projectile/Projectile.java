@@ -1,31 +1,25 @@
 package game.entities.projectile;
 
 import java.awt.Rectangle;
-import java.util.Date;
-import java.util.Random;
-
 import game.Handler;
 import game.entities.Entity;
-import game.gfx.Assets;
 
 public abstract class Projectile extends Entity {
 
 	protected final int xOrigin, yOrigin;
-	protected double angle;
-	protected double nx, ny;
-	protected double distance;
-	protected double speed,range, damage;
+	protected double distance, speed, range, angle,  damage;
 	
-	protected final Random random = new Random(new Date().getTime());
-	
-	public Projectile(Handler handler, int x, int y, double dir) {
-		super(handler, (float)x,(float) y, 32, 32);
+	//constructor
+	public Projectile(Handler handler, int x, int y, double dir, int width, int height) {
+		super(handler, (float)x,(float) y, width, height);
 		xOrigin = x;
 		yOrigin = y;
 		angle = dir;
 	}
 
 	protected void move() {
+		if (distance() > range ) 
+			active = false;	
 		if (angle == 1)
 			y -= speed;
 		else if (angle == 2)
@@ -36,29 +30,22 @@ public abstract class Projectile extends Entity {
 			x += speed;
 		else
 			y += speed;
-
-		// x += nx;
-		// y += ny;
-
-		if (distance() > range) {
-			active = false;
-		}
+		
 	}
-	protected double distance() {
-		double dist = 0;
-		dist = Math.sqrt(Math.abs(Math.pow((xOrigin - x), 2)) + Math.abs(Math.pow((yOrigin - y), 2)));
-		return dist;
-	}
+	
 	protected void checkAttacks(){
 		for (Entity e : handler.getWorld().getEntityManager().getEntities()) {
 			if (e.equals(this) || e.equals(handler.getWorld().getEntityManager().getPlayer()))
 				continue;
-			if (e.getCollisionBounds(0, 0).intersects(new Rectangle((int)(x)
-					,(int) (y), 32, 32))) {
+			if (e.getCollisionBounds(0, 0).intersects(new Rectangle((int)(x) ,(int) (y), width, height))) {
 				e.hurt((int)damage);
 				active = false;
 				return;
 			}
 		}
 	}
+	protected double distance() {
+		return Math.sqrt(Math.abs(Math.pow((xOrigin - x), 2)) + Math.abs(Math.pow((yOrigin - y), 2)));
+	}
+	
 }

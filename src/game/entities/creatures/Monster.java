@@ -15,9 +15,9 @@ public class Monster extends Creature {
 	// Attack timer
 	private long lastAttackTimer, attackCooldown = 800, attackTimer = attackCooldown;
 	private float distanceAttack;
-	private boolean attackPlayer;
 	private float distanceLeft, distanceRight, distanceUp, distanceDown;
 	private int moveRate;
+	private boolean attackPlayer;
 
 	public Monster(Handler handler, float x, float y) {
 		super(handler, x, y, Creature.DEFAULT_CREATURE_WIDTH, Creature.DEFAULT_CREATURE_HEIGHT);
@@ -30,7 +30,7 @@ public class Monster extends Creature {
 		distanceUp = 64f;
 		distanceDown = 0f;
 		moveRate = 100;
-		// from entity class, change to player model size
+		// 
 		bounds.x = 22;
 		bounds.y = 44;
 		bounds.width = 19;
@@ -55,12 +55,10 @@ public class Monster extends Creature {
 		getInput();
 		attackPlayer();
 		move();
-
 	}
 
-	public float getDistance(float v, float h) {
-		double distance = Math.sqrt((double) (v * v) + (double) (h * h));
-		return (float) distance;
+	private float getDistance(float v, float h) {
+		return (float)Math.sqrt( (v * v) + (h * h));
 	}
 
 	public void attackPlayer() {
@@ -78,6 +76,7 @@ public class Monster extends Creature {
 	// display output if the player dies
 	@Override
 	public void die() {
+		
 	}
 
 	// get move input from random number generator
@@ -88,10 +87,8 @@ public class Monster extends Creature {
 		yMove = 0;
 		attackPlayer = false;
 
-		float v = handler.getWorld().getEntityManager().getPlayer().getCollisionBounds(0, 0).x
-				- this.getCollisionBounds(0, 0).x;
-		float h = handler.getWorld().getEntityManager().getPlayer().getCollisionBounds(0, 0).y
-				- this.getCollisionBounds(0, 0).y;
+		float v = handler.getWorld().getEntityManager().getPlayer().getCollisionBounds(0, 0).x - this.getCollisionBounds(0, 0).x;
+		float h = handler.getWorld().getEntityManager().getPlayer().getCollisionBounds(0, 0).y - this.getCollisionBounds(0, 0).y;
 
 		if (getDistance(v, h) < distanceAttack) {
 			speed = 1.5f;
@@ -110,9 +107,7 @@ public class Monster extends Creature {
 				yMove = -speed;	
 			}
 		} else {
-
 			speed = 0.3f;
-
 			if (distanceRight >= 0f && distanceRight <= 64f) {
 				xMove = speed;
 				distanceRight += speed;
@@ -135,26 +130,23 @@ public class Monster extends Creature {
 				yMove = -speed;
 				distanceUp -= speed;
 			}
-
 			if (distanceUp < 0f) {
 				distanceUp = 64f;
 				distanceDown = 0f;
 			}
-
 		}
-
 	}
 
 	// render graphics
 	@Override
 	public void render(Graphics g) {
-
+		// hình động cho quái vật
 		g.drawImage(getCurrentAnimationFrame(), (int) (x - handler.getGameCamera().getxOffset()),
 				(int) (y - handler.getGameCamera().getyOffset()), width, height, null);
+		// thanh máu
 		g.setColor(Color.RED);
 		g.fillRect((int) (x + bounds.x - handler.getGameCamera().getxOffset() - 15),
-				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT + 10),
-				(int) (1.0 * health / 20), 3);
+				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT + 10), (int) (1.0 * health / 20), 3);
 
 		// g.fillRect((int) (x + bounds.x -
 		// handler.getGameCamera().getxOffset()),

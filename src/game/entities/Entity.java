@@ -46,7 +46,7 @@ public abstract class Entity {
 			die();
 		}
 	}
-	public void healing(float amt){
+	public void heal(float amt){
 		if(health < DEFAULT_HEALTH)
 			health += amt;
 		else

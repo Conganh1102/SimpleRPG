@@ -2,10 +2,8 @@ package game.entities;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import game.Handler;
 import game.entities.creatures.Player;
-import game.entities.creatures.Monster;
 
 public class EntityManager {
 	

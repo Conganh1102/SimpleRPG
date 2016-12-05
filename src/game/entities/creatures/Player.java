@@ -14,11 +14,11 @@ import game.gfx.Animation;
 import game.gfx.Assets;
 
 public class Player extends Creature {
-	// Animations
+	// hình động cho nhân vật
 	private Animation animDown, animUp, animLeft, animRight, aRight, aLeft, aUp, aDown;
-	// Attack timer
+	// khoảng cách thời gian giữa 2 lần gây sát thương
 	private long lastAttackTimer, attackCooldown = 400, attackTimer = attackCooldown;
-	private float healing;
+	private float heal;
 	private int plusmana;
 	private int tire;
 	private boolean isAttack, isShoot;
@@ -28,14 +28,14 @@ public class Player extends Creature {
 	public Player(Handler handler, float x, float y) {
 		super(handler, x, y, 256, 128);
 		dameged = 200;
-		healing = 0.1f;
-		plusmana = 1;
+		heal = 0.5f;
+		plusmana = 2;
 		isAttack = false;
 		isShoot = false;
 		speed = 2.5f;
 		tire = 1;
 
-		// from entity class, change to player model size
+		// hình bao quanh nhân vật
 		bounds.x = 118;// 22
 		bounds.y = 85;// 44
 		bounds.width = 19;// 19
@@ -55,7 +55,8 @@ public class Player extends Creature {
 	@Override
 	public void tick() {
 
-		// Animations
+		handler.getGameCamera().centerOnEntity(this);
+		// hình động
 		animDown.tick();
 		animUp.tick();
 		animRight.tick();
@@ -65,22 +66,20 @@ public class Player extends Creature {
 		aRight.tick();
 		aLeft.tick();
 
-		updateShooting();
-		// Movement
+		// kiểm tra di chuyển
 		getInput();
 		move();
-		handler.getGameCamera().centerOnEntity(this);
-		// Attack
-		checkAttacks();
 
+		// kiểm tra tấn công
+		checkAttacks();
+		updateShooting();
+		// hồi phục
 		recuperate();
 	}
 
 	private boolean checkAttackTimer() {
-		// update cool downs on attack
 		attackTimer += System.currentTimeMillis() - lastAttackTimer;
 		lastAttackTimer = System.currentTimeMillis();
-		// if the player cannot attack, stop
 		if (attackTimer < attackCooldown)
 			return true;
 		return false;
@@ -92,15 +91,13 @@ public class Player extends Creature {
 				strong(plusmana);
 			}
 			if (attackTimer > 60000)
-				healing(healing);
+				heal(heal);
 		}
-
 	}
 
 	private void checkAttacks() {
 		if (checkAttackTimer())
 			return;
-
 		// collision bounds rectangle
 		Rectangle cb = getCollisionBounds(0, 0);
 		// attack rectangle ( range )
@@ -126,14 +123,12 @@ public class Player extends Creature {
 		} else {
 			return;
 		}
-
 		attackTimer = 0;
-
 		// check if the player damaged anything
 		for (Entity e : handler.getWorld().getEntityManager().getEntities()) {
 			if (e.equals(this))
 				continue;
-			if (e.getCollisionBounds(0, 0).intersects(ar) && mana > 10) {
+			if (e.getCollisionBounds(0, 0).intersects(ar) && mana > tire) {
 				e.hurt(dameged);
 				return;
 			}
@@ -154,7 +149,6 @@ public class Player extends Creature {
 		attack = 0;
 		isAttack = false;
 		isShoot = false;
-		// System.out.println(fireRate);
 		if (fireRate > 0)
 			fireRate--;
 
@@ -163,8 +157,8 @@ public class Player extends Creature {
 			dir = 1;
 		}
 		if (handler.getKeyManager().down) {
-			dir = 2;
 			yMove = speed;
+			dir = 2;
 		}
 		if (handler.getKeyManager().left) {
 			xMove = -speed;
@@ -174,33 +168,27 @@ public class Player extends Creature {
 			xMove = speed;
 			dir = 4;
 		}
-		
-		
-		if (mana > 0) {
-			
-			if (handler.getMouseManager().isLeftPressed()) {
-				isAttack = true;
-				tired(tire);	
-			}
-			if ((handler.getKeyManager().fire || handler.getMouseManager().isRightPressed()) && fireRate <= 0) {
-				tired(100*tire);
-				isShoot = true;
-				fireRate = FireProjectile.FIRE_RATE;
-			}
-			
+		if (handler.getMouseManager().isLeftPressed()) {
+			isAttack = true;
+			tire(tire);
 		}
-
+		if ((handler.getKeyManager().fire || handler.getMouseManager().isRightPressed()) && fireRate <= 0
+				&& mana > 50 * tire) {
+			isShoot = true;
+			tire(50 * tire);
+			fireRate = FireProjectile.FIRE_RATE;
+		}
 	}
 
 	private void updateShooting() {
-		if (isShoot) {
-			shoot((int) (x + this.width/2 - 15), (int) (y + this.height/2), dir);
+		if (isShoot && mana > tire) {
+			attackTimer = 0;
+			shoot((int) (x + this.width / 2 - 15), (int) (y + this.height / 2), dir);
+			isShoot = false;
 		}
-
 	}
 
 	private void shoot(int x, int y, double dir) {
-
 		Projectile p = new FireProjectile(handler, x, y, dir);
 		handler.getWorld().getEntityManager().addEntity(p);
 	}
@@ -208,23 +196,25 @@ public class Player extends Creature {
 	// render graphics
 	@Override
 	public void render(Graphics g) {
-		// center the game camera on the player
+		// nhân vật
 		g.drawImage(getCurrentAnimationFrame(), (int) (x - handler.getGameCamera().getxOffset()),
 				(int) (y - handler.getGameCamera().getyOffset()), width, height, null);
+		// thanh máu
+		g.setColor(Color.black);
+		g.fillRect((int) (x + bounds.x - handler.getGameCamera().getxOffset() - 17),
+				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT - 15),(int) (1.0 * DEFAULT_HEALTH / 20), 4);
 		g.setColor(Color.red);
 		g.fillRect((int) (x + bounds.x - handler.getGameCamera().getxOffset() - 17),
-				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT - 15),
-				(int) (1.0 * health / 20), 4);
-
-//		 g.fillRect((int) (x + bounds.x -
-//		 handler.getGameCamera().getxOffset()),
-//		 (int) (y + bounds.y - handler.getGameCamera().getyOffset()),
-//		 bounds.width, bounds.height);
-
+				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT - 15),(int) (1.0 * health / 20), 4);
+		// thanh mana
 		g.setColor(Color.green);
 		g.fillRect((int) (x + bounds.x - handler.getGameCamera().getxOffset() - 17),
-				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT - 10), mana / 20, 4);
+				(int) (y + bounds.y - handler.getGameCamera().getyOffset() - Tile.TILEHEIGHT - 10), mana / 20, 2);
 
+		// g.fillRect((int) (x + bounds.x -
+		// handler.getGameCamera().getxOffset()),
+		// (int) (y + bounds.y - handler.getGameCamera().getyOffset()),
+		// bounds.width, bounds.height);
 	}
 
 	// return animation frame
@@ -237,29 +227,17 @@ public class Player extends Creature {
 			return animUp.getCurrentFrame();
 		else if (yMove > 0)
 			return animDown.getCurrentFrame();
-		else if (dir == 1){
-			if(isAttack)
-				return aUp.getCurrentFrame();
-			return animUp.getFrame(2);
-		}
-		else if (dir == 2){
-			if(isAttack)
-				return aDown.getCurrentFrame();
-			return animDown.getFrame(2);
-		}
-		else if (dir == 3){
-			if(isAttack)
-				return aLeft.getCurrentFrame();
-			return animLeft.getFrame(2);
-		}
-		else if (dir == 4){
-			if(isAttack)
-				return aRight.getCurrentFrame();
-			return animRight.getFrame(2);	
+		else if (dir == 1) {
+			return isAttack && mana > tire ? aUp.getCurrentFrame() : animUp.getFrame(2);
+		} else if (dir == 2) {
+			return isAttack && mana > tire ? aDown.getCurrentFrame() : animDown.getFrame(2);
+		} else if (dir == 3) {
+			return isAttack && mana > tire ? aLeft.getCurrentFrame() : animLeft.getFrame(2);
+		} else if (dir == 4) {
+			return isAttack && mana > tire ? aRight.getCurrentFrame() : animRight.getFrame(2);
 		}
 		else
 			return animDown.getFrame(2);
-
 	}
 
 }
